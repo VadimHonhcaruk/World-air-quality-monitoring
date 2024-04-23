@@ -1,0 +1,16 @@
+.option {
+  text-decoration: none;
+  color: white;
+  font-size: 20px;
+  font-family: NastupSoft;
+  transition: all ease-in 0.1s;
+}
+
+.option:hover {
+  text-decoration: underline;
+  color: rgb(100, 234, 129);
+}
+
+.optionChoosen {
+  color: rgb(100, 234, 129);
+}

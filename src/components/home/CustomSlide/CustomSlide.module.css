@@ -1,0 +1,8 @@
+.photo {
+  height: 88vh;
+  margin: auto;
+  object-fit: cover;
+  width: 100vw;
+  filter: grayscale(100%);
+  opacity: 0.3;
+}
