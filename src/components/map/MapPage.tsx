@@ -201,13 +201,21 @@ const mapStyles = [
   },
 ];
 
+declare var process: {
+  env: {
+    REACT_APP_GOOGLE_API_TOKEN: string;
+  };
+};
+
+const TOKEN = process.env.REACT_APP_GOOGLE_API_TOKEN;
+
 const MapPage: React.FC = () => {
   const dispatch = useDispatch();
   const coord = useSelector((state: any) => state.coord);
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "AIzaSyDRAezkJZa0WJgDDSFGruC12YKuoMsf-qc",
+    googleMapsApiKey: TOKEN,
   });
 
   const onLoad = React.useCallback(function callback(map: google.maps.Map) {
