@@ -39,3 +39,11 @@ h1 {
   letter-spacing: 3px;
   color: rgb(100, 234, 129);
 }
+
+.gmnoprint {
+  display: none !important;
+}
+
+a div img {
+  display: none;
+}
