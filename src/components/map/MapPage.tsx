@@ -19,7 +19,7 @@ const mapStyles = [
     elementType: "geometry",
     stylers: [
       {
-        color: "#1a1b1b",
+        color: "#454545",
       },
     ],
   },
@@ -52,7 +52,7 @@ const mapStyles = [
     elementType: "geometry",
     stylers: [
       {
-        color: "#1d7430",
+        color: "#21933a",
       },
     ],
   },
