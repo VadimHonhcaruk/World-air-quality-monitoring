@@ -1,0 +1,10 @@
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: Fixel;
+  color: white;
+  font-size: 40px;
+  width: 60%;
+  margin: auto;
+}

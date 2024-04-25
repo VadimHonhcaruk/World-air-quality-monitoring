@@ -8,4 +8,23 @@
   font-family: Nastup;
   font-size: 30px;
   text-align: center;
+  margin: 2rem;
+  letter-spacing: 5px;
+}
+
+.city {
+  color: rgb(168, 186, 172);
+  font-family: Fixel;
+  font-size: 20px;
+  text-align: center;
+  width: 60%;
+  margin: auto;
+  margin-bottom: 2rem;
+  height: 10vh;
+}
+
+.speedCont {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
