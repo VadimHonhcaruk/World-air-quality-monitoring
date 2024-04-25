@@ -2,6 +2,7 @@ import React from "react";
 import c from "./Subtitle.module.css";
 import { Button } from "../../button/Button";
 import { useNavigate } from "react-router-dom";
+import { TypeAnimation } from "react-type-animation";
 
 export const Subtitle: React.FC = () => {
   const navigate = useNavigate();
@@ -9,7 +10,26 @@ export const Subtitle: React.FC = () => {
   return (
     <div className={c.caption}>
       <h1 className={c.title}>
-        Чистота повітря - <span className={c.highlight}>це важливо.</span>
+        Чистота повітря -{" "}
+        <span className={c.highlight}>
+          <TypeAnimation
+            sequence={[
+              "це важливо.",
+              2000,
+              "основа здоров'я.",
+              2000,
+              "важливий фактор.",
+              2000,
+              "ключ до комфорту.",
+              2000,
+              "здоров'я всього світу.",
+              2000,
+            ]}
+            wrapper="span"
+            speed={20}
+            repeat={Infinity}
+          />
+        </span>
       </h1>
       <h2 className={c.subtitle}>
         Дізнайтеся про якість <span className={c.highlight}>повітря</span> у
