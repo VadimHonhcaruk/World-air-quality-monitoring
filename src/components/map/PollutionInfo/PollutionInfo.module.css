@@ -1,0 +1,11 @@
+.cont {
+  height: 88vh;
+  width: 30vw;
+}
+
+.title {
+  color: rgb(100, 234, 129);
+  font-family: Nastup;
+  font-size: 30px;
+  text-align: center;
+}
