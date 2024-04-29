@@ -4,10 +4,8 @@ import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { setData } from "../../../redux/actions/dataActions";
 import { Option } from "./Option/Option";
-import ReactSpeedometer, {
-  CustomSegmentLabelPosition,
-  Transition,
-} from "react-d3-speedometer";
+import ReactSpeedometer, { Transition } from "react-d3-speedometer";
+import { ColorInfo } from "./ColorInfo/ColorInfo";
 
 export const PollutionInfo: React.FC = () => {
   const TOKEN = process.env.REACT_APP_WAQI_API_TOKEN;
@@ -34,7 +32,7 @@ export const PollutionInfo: React.FC = () => {
     fetchData();
   }, [dispatch, coord, TOKEN]);
 
-  return (
+  return pollutionData?.data?.aqi ? (
     <aside className={c.cont}>
       <h3 className={c.title}>Стан повітря</h3>
       <h4 className={c.city}>{pollutionData?.data?.city?.name}</h4>
@@ -51,8 +49,8 @@ export const PollutionInfo: React.FC = () => {
             "#ffde33",
             "#ff9933",
             "#cc0033",
-            "#660099",
             "#7e0023",
+            "#660099",
           ]}
           currentValueText={`AQI: ${pollutionData?.data?.aqi}`}
           needleTransitionDuration={3333}
@@ -67,6 +65,9 @@ export const PollutionInfo: React.FC = () => {
       {pollutionData?.data?.iaqi?.pm25?.v && (
         <Option title="PM25" value={pollutionData.data.iaqi.pm25.v} />
       )}
+      {pollutionData?.data?.iaqi?.co?.v && (
+        <Option title="CO" value={pollutionData.data.iaqi.co.v} />
+      )}
       {pollutionData?.data?.iaqi?.no2?.v && (
         <Option title="NO2" value={pollutionData.data.iaqi.no2.v} />
       )}
@@ -76,6 +77,31 @@ export const PollutionInfo: React.FC = () => {
       {pollutionData?.data?.iaqi?.so2?.v && (
         <Option title="SO2" value={pollutionData.data.iaqi.so2.v} />
       )}
+    </aside>
+  ) : (
+    <aside className={c.cont}>
+      <h3 className={c.title}>Інформація</h3>
+      <p className={c.start}>
+        Для початку роботи - оберіть будь-яке місце на карті, натиснувши на
+        нього.
+      </p>
+      <p className={c.start}>
+        Якщо в обраній точці немає інформації про забруднення - ви отримуєте
+        дані найближчої точки.
+      </p>
+      <p className={c.start}>Рівні забруднення повітря за показником AQI:</p>
+      <div className={c.infoFlex}>
+        <ColorInfo range="0-50" color="#009966" title="Добрий" />
+        <ColorInfo range="51-100" color="#ffde33" title="Помірний" />
+        <ColorInfo
+          range="101-150"
+          color="#ff9933"
+          title="Нездоровий для чутливих груп"
+        />
+        <ColorInfo range="151-200" color="#cc0033" title="Нездоровий" />
+        <ColorInfo range="201-300" color="#7e0023" title="Дуже нездоровий" />
+        <ColorInfo range="300+" color="#660099" title="Небезпечний" />
+      </div>
     </aside>
   );
 };

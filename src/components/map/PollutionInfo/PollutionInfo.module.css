@@ -28,3 +28,21 @@
   align-items: center;
   justify-content: center;
 }
+
+.start {
+  color: white;
+  text-align: center;
+  font-family: Fixel;
+  font-size: 1.4rem;
+  font-weight: 900;
+  width: 80%;
+  margin: auto;
+  margin-bottom: 2rem;
+}
+
+.infoFlex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
