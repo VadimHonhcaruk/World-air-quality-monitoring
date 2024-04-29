@@ -4,6 +4,7 @@ import Header from "./components/header/Header";
 import Home from "./components/home/Home";
 import { NotFound } from "./components/notfound/NotFound";
 import MapPage from "./components/map/MapPage";
+import { Pollutants } from "./components/pollutants/Pollutants";
 
 const App: React.FC = () => {
   return (
@@ -13,7 +14,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/home" element={<Home />} />
           <Route path="/map" element={<MapPage />} />
-          <Route path="/about" element={<></>} />
+          <Route path="/pollutants" element={<Pollutants />} />
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

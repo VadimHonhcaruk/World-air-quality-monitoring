@@ -1,0 +1,31 @@
+.title {
+  font-size: 2.8rem;
+  letter-spacing: 5px;
+  font-family: Nastup;
+}
+
+.cont {
+  padding: 2% 5%;
+  color: white;
+  font-family: Fixel;
+  background-color: #0000009a;
+  background-image: url("../../images/landscape.png");
+  background-size: cover;
+  background-blend-mode: multiply;
+}
+
+.paragraph {
+  font-size: 2rem;
+}
+
+.vstup {
+  margin-top: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 5%;
+}
+
+.image {
+  width: 300px;
+  filter: brightness(0.9);
+}

@@ -1,0 +1,28 @@
+.subtitle {
+  font-size: 3rem;
+  font-family: Nastup;
+  margin-bottom: 2rem;
+  letter-spacing: 2px;
+}
+
+.subtitle::first-letter {
+  color: rgb(203, 42, 42);
+}
+
+.pollTopic {
+  margin-top: 3rem;
+}
+
+.image {
+  width: 400px;
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+  gap: 5%;
+}
+
+.paragraph {
+  font-size: 2rem;
+}
