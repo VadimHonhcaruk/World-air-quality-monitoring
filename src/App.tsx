@@ -5,6 +5,7 @@ import Home from "./components/home/Home";
 import { NotFound } from "./components/notfound/NotFound";
 import MapPage from "./components/map/MapPage";
 import { Pollutants } from "./components/pollutants/Pollutants";
+import { TopAqi } from "./components/topAqi/TopAqi";
 
 const App: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ const App: React.FC = () => {
           <Route path="/home" element={<Home />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/pollutants" element={<Pollutants />} />
+          {/* <Route path="/top" element={<TopAqi />} /> */}
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

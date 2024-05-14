@@ -8,6 +8,7 @@ const Navigation: React.FC = () => {
       <NavOption path="/home" label="Головна" />
       <NavOption path="/map" label="Карта" />
       <NavOption path="/pollutants" label="Забруднювачі" />
+      {/* <NavOption path="/top" label="Топ" /> */}
     </nav>
   );
 };

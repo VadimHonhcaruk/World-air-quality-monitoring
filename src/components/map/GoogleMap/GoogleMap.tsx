@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import React, { useEffect, useState } from "react";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { useDispatch, useSelector } from "react-redux";
 import { setCoord } from "../../../redux/actions";
 
@@ -207,11 +207,18 @@ declare var process: {
   };
 };
 
+interface MarkerType {
+  lat: number;
+  lng: number;
+}
+
 const TOKEN = process.env.REACT_APP_GOOGLE_API_TOKEN;
 
 const GoogleMapComp: React.FC = () => {
   const dispatch = useDispatch();
-  const coord = useSelector((state: any) => state.coord);
+  const pollutionData = useSelector((state: any) => state.data);
+
+  const [markers, setMarkers] = useState<MarkerType[]>([]);
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -226,8 +233,21 @@ const GoogleMapComp: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log(coord);
-  }, [coord]);
+    if (
+      pollutionData &&
+      pollutionData.data &&
+      pollutionData.data.city &&
+      pollutionData.data.city.geo
+    ) {
+      const newMarkers = [
+        {
+          lat: pollutionData.data.city.geo[0],
+          lng: pollutionData.data.city.geo[1],
+        },
+      ];
+      setMarkers(newMarkers);
+    }
+  }, [pollutionData]);
 
   return isLoaded ? (
     <GoogleMap
@@ -251,15 +271,18 @@ const GoogleMapComp: React.FC = () => {
         maxZoom: 10,
         restriction: {
           latLngBounds: {
-            north: 85, // Максимальная северная граница карты
-            south: -85, // Минимальная южная граница карты
-            west: -179.9, // Минимальная западная граница карты
-            east: 179.9, // Максимальная восточная граница карты
+            north: 85,
+            south: -85,
+            west: -179.9,
+            east: 179.9,
           },
           strictBounds: false,
         },
       }}
     >
+      {markers.map((marker, index) => (
+        <Marker key={index} position={{ lat: marker.lat, lng: marker.lng }} />
+      ))}
       <></>
     </GoogleMap>
   ) : (
