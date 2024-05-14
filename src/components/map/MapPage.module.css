@@ -1,3 +1,29 @@
 .cont {
   display: flex;
 }
+
+.combox {
+  position: absolute;
+  left: 31vw;
+  top: calc(13vh);
+}
+
+.comboxInp {
+  background-color: #1c1a1a;
+  outline: none;
+  color: #64ea81;
+  font-size: 20px;
+  padding: 0.4rem 1rem;
+  width: 400px;
+  border: 1px solid #64ea81;
+}
+
+.list {
+  background-color: #1c1a1a;
+  color: white;
+}
+
+li:hover {
+  background-color: #2a2e2a !important;
+  color: #64ea81 !important;
+}

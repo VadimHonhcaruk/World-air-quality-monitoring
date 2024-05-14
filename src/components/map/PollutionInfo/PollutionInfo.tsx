@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import c from "./PollutionInfo.module.css";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
@@ -6,16 +6,15 @@ import { setData } from "../../../redux/actions/dataActions";
 import { Option } from "./Option/Option";
 import ReactSpeedometer, { Transition } from "react-d3-speedometer";
 import { ColorInfo } from "./ColorInfo/ColorInfo";
+import { getDistance } from "geolib";
+import { AQItoConc } from "../../../utils/AQItoConc";
 
 export const PollutionInfo: React.FC = () => {
   const TOKEN = process.env.REACT_APP_WAQI_API_TOKEN;
   const coord = useSelector((state: any) => state.coord);
   const dispatch = useDispatch();
   const pollutionData = useSelector((state: any) => state.data);
-
-  useEffect(() => {
-    console.log(pollutionData);
-  }, [pollutionData]);
+  const [distance, setDistance] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,15 +31,34 @@ export const PollutionInfo: React.FC = () => {
     fetchData();
   }, [dispatch, coord, TOKEN]);
 
+  useEffect(() => {
+    if (pollutionData.data && coord.coord[0]) {
+      const point1 = { latitude: coord.coord[0], longitude: coord.coord[1] };
+      const point2 = {
+        latitude: pollutionData?.data?.city?.geo[0],
+        longitude: pollutionData?.data?.city?.geo[1],
+      };
+      setDistance(getDistance(point1, point2));
+    }
+  }, [pollutionData]);
+
   return pollutionData?.data?.aqi ? (
     <aside className={c.cont}>
       <h3 className={c.title}>Стан повітря</h3>
+      <div className={c.dist}>
+        Дистанція до найближчої точки моніторингу:{" "}
+        <strong className={c.strongDis}>
+          {(distance / 1000).toFixed(0)}км
+        </strong>
+      </div>
       <h4 className={c.city}>{pollutionData?.data?.city?.name}</h4>
       <div className={c.speedCont}>
         <ReactSpeedometer
           width={400}
           needleHeightRatio={0.8}
-          value={pollutionData?.data?.aqi}
+          value={
+            pollutionData?.data?.aqi > 500 ? 500 : pollutionData?.data?.aqi
+          }
           customSegmentStops={[0, 50, 100, 150, 200, 300, 500]}
           minValue={0}
           maxValue={500}
@@ -60,22 +78,40 @@ export const PollutionInfo: React.FC = () => {
         />
       </div>
       {pollutionData?.data?.iaqi?.pm10?.v && (
-        <Option title="PM10" value={pollutionData.data.iaqi.pm10.v} />
+        <Option
+          title="PM10"
+          value={AQItoConc("PM10", pollutionData.data.iaqi.pm10.v)}
+        />
       )}
       {pollutionData?.data?.iaqi?.pm25?.v && (
-        <Option title="PM25" value={pollutionData.data.iaqi.pm25.v} />
+        <Option
+          title="PM2.5"
+          value={AQItoConc("PM2.5", pollutionData.data.iaqi.pm25.v)}
+        />
       )}
       {pollutionData?.data?.iaqi?.co?.v && (
-        <Option title="CO" value={pollutionData.data.iaqi.co.v} />
+        <Option
+          title="CO"
+          value={AQItoConc("CO", pollutionData.data.iaqi.co.v)}
+        />
       )}
       {pollutionData?.data?.iaqi?.no2?.v && (
-        <Option title="NO2" value={pollutionData.data.iaqi.no2.v} />
+        <Option
+          title="NO2"
+          value={AQItoConc("NO2", pollutionData.data.iaqi.no2.v)}
+        />
       )}
       {pollutionData?.data?.iaqi?.o3?.v && (
-        <Option title="O3" value={pollutionData.data.iaqi.o3.v} />
+        <Option
+          title="O3"
+          value={AQItoConc("O3", pollutionData.data.iaqi.o3.v)}
+        />
       )}
       {pollutionData?.data?.iaqi?.so2?.v && (
-        <Option title="SO2" value={pollutionData.data.iaqi.so2.v} />
+        <Option
+          title="SO2"
+          value={AQItoConc("SO2", pollutionData.data.iaqi.so2.v)}
+        />
       )}
     </aside>
   ) : (

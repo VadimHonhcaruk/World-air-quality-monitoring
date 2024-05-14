@@ -1,7 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  Marker,
+  useJsApiLoader,
+  PolylineF,
+} from "@react-google-maps/api";
 import { useDispatch, useSelector } from "react-redux";
 import { setCoord } from "../../../redux/actions";
+import usePlacesAutocomplete, {
+  getGeocode,
+  getLatLng,
+} from "use-places-autocomplete";
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxPopover,
+  ComboboxList,
+  ComboboxOption,
+} from "@reach/combobox";
+import "@reach/combobox/styles.css";
+import c from "../MapPage.module.css";
 
 const containerStyle = {
   width: "70vw",
@@ -201,6 +219,10 @@ const mapStyles = [
   },
 ];
 
+const polylineOptions = {
+  strokeColor: "#ffffff",
+};
+
 declare var process: {
   env: {
     REACT_APP_GOOGLE_API_TOKEN: string;
@@ -210,19 +232,29 @@ declare var process: {
 interface MarkerType {
   lat: number;
   lng: number;
+  icon?: string;
+}
+
+interface PlacesAutocompleteProps {
+  setSelected: (position: { lat: number; lng: number }) => void;
 }
 
 const TOKEN = process.env.REACT_APP_GOOGLE_API_TOKEN;
 
 const GoogleMapComp: React.FC = () => {
   const dispatch = useDispatch();
+  const coord = useSelector((state: any) => state.coord);
   const pollutionData = useSelector((state: any) => state.data);
+  const [selected, setSelected] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
 
   const [markers, setMarkers] = useState<MarkerType[]>([]);
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: TOKEN,
+    libraries: ["places"],
   });
 
   const onLoad = React.useCallback(function callback(map: google.maps.Map) {
@@ -233,16 +265,23 @@ const GoogleMapComp: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    setMarkers([]);
     if (
       pollutionData &&
       pollutionData.data &&
       pollutionData.data.city &&
       pollutionData.data.city.geo
     ) {
-      const newMarkers = [
+      const newMarkers: MarkerType[] = [
         {
           lat: pollutionData.data.city.geo[0],
           lng: pollutionData.data.city.geo[1],
+          icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+        },
+        {
+          lat: coord.coord[0],
+          lng: coord.coord[1],
+          icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
         },
       ];
       setMarkers(newMarkers);
@@ -250,44 +289,95 @@ const GoogleMapComp: React.FC = () => {
   }, [pollutionData]);
 
   return isLoaded ? (
-    <GoogleMap
-      mapContainerStyle={containerStyle}
-      center={center}
-      onLoad={onLoad}
-      zoom={5}
-      onClick={(e) => {
-        if (e.latLng) {
-          dispatch(setCoord([e.latLng.lat(), e.latLng.lng()]));
-        }
-      }}
-      options={{
-        styles: mapStyles,
-        fullscreenControl: false,
-        mapTypeControl: false,
-        mapTypeId: "terrain",
-        streetViewControl: false,
-        zoomControl: false,
-        minZoom: 3,
-        maxZoom: 10,
-        restriction: {
-          latLngBounds: {
-            north: 85,
-            south: -85,
-            west: -179.9,
-            east: 179.9,
+    <>
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        center={center}
+        onLoad={onLoad}
+        zoom={5}
+        onClick={(e) => {
+          if (e.latLng) {
+            dispatch(setCoord([e.latLng.lat(), e.latLng.lng()]));
+          }
+        }}
+        options={{
+          styles: mapStyles,
+          fullscreenControl: false,
+          mapTypeControl: false,
+          mapTypeId: "terrain",
+          streetViewControl: false,
+          zoomControl: false,
+          minZoom: 3,
+          maxZoom: 10,
+          restriction: {
+            latLngBounds: {
+              north: 85,
+              south: -85,
+              west: -179.9,
+              east: 179.9,
+            },
+            strictBounds: false,
           },
-          strictBounds: false,
-        },
-      }}
-    >
-      {markers.map((marker, index) => (
-        <Marker key={index} position={{ lat: marker.lat, lng: marker.lng }} />
-      ))}
-      <></>
-    </GoogleMap>
+        }}
+      >
+        {markers.map((marker, index) => (
+          <Marker
+            key={index}
+            position={{ lat: marker.lat, lng: marker.lng }}
+            icon={marker.icon}
+          />
+        ))}
+        {markers.length === 2 && (
+          <PolylineF path={markers} options={polylineOptions} />
+        )}
+      </GoogleMap>
+      <PlacesAutocomplete setSelected={setSelected} />
+    </>
   ) : (
     <></>
   );
 };
 
 export default React.memo(GoogleMapComp);
+
+const PlacesAutocomplete: React.FC<PlacesAutocompleteProps> = ({
+  setSelected,
+}) => {
+  const {
+    ready,
+    value,
+    setValue,
+    suggestions: { status, data },
+    clearSuggestions,
+  } = usePlacesAutocomplete();
+  const dispatch = useDispatch();
+
+  const handleSelect = async (address: string) => {
+    setValue(address, false);
+    clearSuggestions();
+
+    const results = await getGeocode({ address });
+    const { lat, lng } = await getLatLng(results[0]);
+    dispatch(setCoord([lat, lng]));
+  };
+
+  return (
+    <Combobox onSelect={handleSelect} className={c.combox}>
+      <ComboboxInput
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        disabled={!ready}
+        className={c.comboxInp}
+        placeholder="Search an address"
+      />
+      <ComboboxPopover>
+        <ComboboxList className={c.list}>
+          {status === "OK" &&
+            data.map(({ place_id, description }) => (
+              <ComboboxOption key={place_id} value={description} />
+            ))}
+        </ComboboxList>
+      </ComboboxPopover>
+    </Combobox>
+  );
+};

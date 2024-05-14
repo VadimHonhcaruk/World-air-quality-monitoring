@@ -1,6 +1,7 @@
 .cont {
   height: 88vh;
   width: 30vw;
+  overflow-y: scroll;
 }
 
 .title {
@@ -17,16 +18,18 @@
   font-family: Fixel;
   font-size: 20px;
   text-align: center;
-  width: 60%;
+  width: 80%;
   margin: auto;
   margin-bottom: 2rem;
-  height: 10vh;
+  height: 8vh;
+  overflow-y: scroll;
 }
 
 .speedCont {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: -3rem;
 }
 
 .start {
@@ -45,4 +48,20 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
+}
+
+.dist {
+  color: rgb(168, 186, 172);
+  font-family: Fixel;
+  font-size: 20px;
+  text-align: center;
+  width: 60%;
+  height: 5vh;
+  margin: auto;
+  margin-bottom: 2rem;
+}
+
+.strongDis {
+  color: #64ea81;
+  font-size: 23px;
 }

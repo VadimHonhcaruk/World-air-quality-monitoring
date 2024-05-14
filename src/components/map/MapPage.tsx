@@ -6,8 +6,8 @@ import c from "./MapPage.module.css";
 const MapPage: React.FC = () => {
   return (
     <div className={c.cont}>
-      <GoogleMapCont />
       <PollutionInfo />
+      <GoogleMapCont />
     </div>
   );
 };
