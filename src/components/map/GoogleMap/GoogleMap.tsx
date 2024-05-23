@@ -6,7 +6,7 @@ import {
   PolylineF,
 } from "@react-google-maps/api";
 import { useDispatch, useSelector } from "react-redux";
-import { setCoord } from "../../../redux/actions";
+import { setCoord, setCountryShortName } from "../../../redux/actions";
 import usePlacesAutocomplete, {
   getGeocode,
   getLatLng,
@@ -235,19 +235,12 @@ interface MarkerType {
   icon?: string;
 }
 
-interface PlacesAutocompleteProps {
-  setSelected: (position: { lat: number; lng: number }) => void;
-}
-
 const TOKEN = process.env.REACT_APP_GOOGLE_API_TOKEN;
 
 const GoogleMapComp: React.FC = () => {
   const dispatch = useDispatch();
   const coord = useSelector((state: any) => state.coord);
   const pollutionData = useSelector((state: any) => state.data);
-  const [selected, setSelected] = useState<{ lat: number; lng: number } | null>(
-    null
-  );
 
   const [markers, setMarkers] = useState<MarkerType[]>([]);
 
@@ -256,6 +249,20 @@ const GoogleMapComp: React.FC = () => {
     googleMapsApiKey: TOKEN,
     libraries: ["places"],
   });
+
+  useEffect(() => {
+    console.log("TUT");
+    const getCountryName = async () => {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coord.coord[0]},${coord.coord[1]}&key=${TOKEN}`
+      );
+      const data = await response.json();
+      if (data.status === "OK" && data.results.length > 0) {
+        dispatch(setCountryShortName(data.results[0].address_components));
+      }
+    };
+    getCountryName();
+  }, [coord]);
 
   const onLoad = React.useCallback(function callback(map: google.maps.Map) {
     if (window.google && window.google.maps) {
@@ -331,7 +338,7 @@ const GoogleMapComp: React.FC = () => {
           <PolylineF path={markers} options={polylineOptions} />
         )}
       </GoogleMap>
-      <PlacesAutocomplete setSelected={setSelected} />
+      <PlacesAutocomplete />
     </>
   ) : (
     <></>
@@ -340,9 +347,7 @@ const GoogleMapComp: React.FC = () => {
 
 export default React.memo(GoogleMapComp);
 
-const PlacesAutocomplete: React.FC<PlacesAutocompleteProps> = ({
-  setSelected,
-}) => {
+const PlacesAutocomplete: React.FC = () => {
   const {
     ready,
     value,
@@ -368,7 +373,7 @@ const PlacesAutocomplete: React.FC<PlacesAutocompleteProps> = ({
         onChange={(e) => setValue(e.target.value)}
         disabled={!ready}
         className={c.comboxInp}
-        placeholder="Search an address"
+        placeholder="Знайдіть адресу"
       />
       <ComboboxPopover>
         <ComboboxList className={c.list}>

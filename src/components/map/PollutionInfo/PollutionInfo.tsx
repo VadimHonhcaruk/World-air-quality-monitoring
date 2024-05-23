@@ -9,14 +9,72 @@ import { ColorInfo } from "./ColorInfo/ColorInfo";
 import { getDistance } from "geolib";
 import { AQItoConc } from "../../../utils/AQItoConc";
 
+interface AddressComponent {
+  long_name: string;
+  short_name: string;
+  types: string[];
+}
+
 export const PollutionInfo: React.FC = () => {
   const TOKEN = process.env.REACT_APP_WAQI_API_TOKEN;
+  const TOKEN2 = process.env.REACT_APP_GOOGLE_API_TOKEN;
   const coord = useSelector((state: any) => state.coord);
   const dispatch = useDispatch();
   const pollutionData = useSelector((state: any) => state.data);
+  // const countryShortName = useSelector((state: any) => state.country.shortName);
+  const countryShortName = useSelector((state: any) => state.country);
   const [distance, setDistance] = useState<number>(0);
 
   useEffect(() => {
+    const fetchDataUkraine = async () => {
+      try {
+        const response = await fetch(
+          `https://airquality.googleapis.com/v1/currentConditions:lookup?key=${TOKEN2}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              location: {
+                latitude: coord.coord[0],
+                longitude: coord.coord[1],
+              },
+              extraComputations: [
+                "POLLUTANT_CONCENTRATION",
+                "LOCAL_AQI",
+                "POLLUTANT_ADDITIONAL_INFO",
+              ],
+            }),
+          }
+        );
+        const data = await response.json();
+        dispatch(
+          setData({
+            aqi: data.indexes[0].aqi,
+            city: {
+              geo: [coord.coord[0], coord.coord[1]],
+              name:
+                countryShortName?.shortName?.[1]?.long_name +
+                ", " +
+                countryShortName?.shortName?.[4]?.long_name,
+            },
+            iaqi: {
+              pm25: { v: data.pollutants[4].concentration.value },
+              co: { v: data.pollutants[0].concentration.value },
+              no2: { v: data.pollutants[1].concentration.value },
+              o3: { v: data.pollutants[2].concentration.value },
+              pm10: { v: data.pollutants[3].concentration.value },
+              so2: { v: data.pollutants[5].concentration.value },
+            },
+            ua: true,
+          })
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
     const fetchData = async () => {
       try {
         const response = await axios.get(
@@ -28,10 +86,20 @@ export const PollutionInfo: React.FC = () => {
       }
     };
 
-    fetchData();
-  }, [dispatch, coord, TOKEN]);
+    const countryComponent = countryShortName?.shortName?.[0]
+      ? countryShortName.shortName.find((component: any) =>
+          component.types.includes("country")
+        )
+      : false;
+    if (countryComponent?.short_name === "UA") {
+      fetchDataUkraine();
+    } else {
+      fetchData();
+    }
+  }, [dispatch, countryShortName, TOKEN]);
 
   useEffect(() => {
+    console.log(pollutionData);
     if (pollutionData.data && coord.coord[0]) {
       const point1 = { latitude: coord.coord[0], longitude: coord.coord[1] };
       const point2 = {
@@ -45,12 +113,14 @@ export const PollutionInfo: React.FC = () => {
   return pollutionData?.data?.aqi ? (
     <aside className={c.cont}>
       <h3 className={c.title}>Стан повітря</h3>
-      <div className={c.dist}>
-        Дистанція до найближчої точки моніторингу:{" "}
-        <strong className={c.strongDis}>
-          {(distance / 1000).toFixed(0)}км
-        </strong>
-      </div>
+      {pollutionData.data.ua === true || (
+        <div className={c.dist}>
+          Дистанція до найближчої точки моніторингу:{" "}
+          <strong className={c.strongDis}>
+            {(distance / 1000).toFixed(1)}км
+          </strong>
+        </div>
+      )}
       <h4 className={c.city}>{pollutionData?.data?.city?.name}</h4>
       <div className={c.speedCont}>
         <ReactSpeedometer
@@ -80,37 +150,61 @@ export const PollutionInfo: React.FC = () => {
       {pollutionData?.data?.iaqi?.pm10?.v && (
         <Option
           title="PM10"
-          value={AQItoConc("PM10", pollutionData.data.iaqi.pm10.v)}
+          value={
+            pollutionData.data.ua === true
+              ? pollutionData.data.iaqi.pm10.v
+              : AQItoConc("PM10", pollutionData.data.iaqi.pm10.v)
+          }
         />
       )}
       {pollutionData?.data?.iaqi?.pm25?.v && (
         <Option
           title="PM2.5"
-          value={AQItoConc("PM2.5", pollutionData.data.iaqi.pm25.v)}
+          value={
+            pollutionData.data.ua === true
+              ? pollutionData.data.iaqi.pm25.v
+              : AQItoConc("PM2.5", pollutionData.data.iaqi.pm25.v)
+          }
         />
       )}
       {pollutionData?.data?.iaqi?.co?.v && (
         <Option
           title="CO"
-          value={AQItoConc("CO", pollutionData.data.iaqi.co.v)}
+          value={
+            pollutionData.data.ua === true
+              ? pollutionData.data.iaqi.co.v
+              : AQItoConc("CO", pollutionData.data.iaqi.co.v)
+          }
         />
       )}
       {pollutionData?.data?.iaqi?.no2?.v && (
         <Option
           title="NO2"
-          value={AQItoConc("NO2", pollutionData.data.iaqi.no2.v)}
+          value={
+            pollutionData.data.ua === true
+              ? pollutionData.data.iaqi.no2.v
+              : AQItoConc("NO2", pollutionData.data.iaqi.no2.v)
+          }
         />
       )}
       {pollutionData?.data?.iaqi?.o3?.v && (
         <Option
           title="O3"
-          value={AQItoConc("O3", pollutionData.data.iaqi.o3.v)}
+          value={
+            pollutionData.data.ua === true
+              ? pollutionData.data.iaqi.o3.v
+              : AQItoConc("O3", pollutionData.data.iaqi.o3.v)
+          }
         />
       )}
       {pollutionData?.data?.iaqi?.so2?.v && (
         <Option
           title="SO2"
-          value={AQItoConc("SO2", pollutionData.data.iaqi.so2.v)}
+          value={
+            pollutionData.data.ua === true
+              ? pollutionData.data.iaqi.so2.v
+              : AQItoConc("SO2", pollutionData.data.iaqi.so2.v)
+          }
         />
       )}
     </aside>

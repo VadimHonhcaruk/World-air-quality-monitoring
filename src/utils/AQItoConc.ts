@@ -72,7 +72,7 @@ const convertAqiToConcentration = (
   const range = breakpoints.find(
     (range) => aqi >= range.aqiLow && aqi <= range.aqiHigh
   );
-  if (!range) throw new Error("AQI out of range");
+  if (!range) return breakpoints[6].concHigh;
   return (
     ((aqi - range.aqiLow) * (range.concHigh - range.concLow)) /
       (range.aqiHigh - range.aqiLow) +
@@ -82,7 +82,6 @@ const convertAqiToConcentration = (
 
 export const AQItoConc = (pollutant: string, aqiValue: number) => {
   let concentration;
-  console.log(pollutant, aqiValue);
   switch (pollutant) {
     case "PM2.5":
       concentration = convertAqiToConcentration(aqiValue, pm25Breakpoints);
