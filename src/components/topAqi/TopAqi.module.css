@@ -1,0 +1,42 @@
+.top {
+  display: flex;
+  padding: 0 2%;
+  align-items: center;
+  justify-content: center;
+  background-image: url("../../images/kyiv.jpg");
+  background-size: cover;
+}
+
+.table {
+  width: 90vw;
+  border-collapse: collapse;
+  margin: 20px 0;
+  background-color: rgba(0, 0, 0, 0.677);
+}
+
+.th,
+.td {
+  padding: 8px 0;
+  text-align: center;
+  color: rgb(221, 235, 211);
+  font-size: 30px;
+  border: 1px solid white;
+}
+
+.th {
+  font-family: Nastup;
+  color: #64ea81;
+}
+
+.th:hover {
+  background-color: rgba(0, 0, 0, 0.462);
+  cursor: pointer;
+}
+
+.td {
+  font-family: Fixel;
+}
+
+.nameCity {
+  font-weight: 900;
+}
