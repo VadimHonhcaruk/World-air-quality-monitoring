@@ -8,6 +8,7 @@ import ReactSpeedometer, { Transition } from "react-d3-speedometer";
 import { ColorInfo } from "./ColorInfo/ColorInfo";
 import { getDistance } from "geolib";
 import { AQItoConc } from "../../../utils/AQItoConc";
+import { calculateAQHI } from "../../../utils/AQHIcals";
 
 interface AddressComponent {
   long_name: string;
@@ -207,6 +208,69 @@ export const PollutionInfo: React.FC = () => {
           }
         />
       )}
+      {(pollutionData?.data?.iaqi?.pm25?.v ||
+        pollutionData?.data?.iaqi?.o3?.v ||
+        pollutionData?.data?.iaqi?.no2?.v) && (
+        <div className={c.speedCont}>
+          <ReactSpeedometer
+            width={400}
+            needleHeightRatio={0.8}
+            value={calculateAQHI({
+              o3: {
+                v: pollutionData?.data?.iaqi?.o3?.v
+                  ? AQItoConc("PM10", pollutionData.data.iaqi.o3.v)
+                  : 0,
+              },
+              pm25: {
+                v: pollutionData?.data?.iaqi?.pm25?.v
+                  ? AQItoConc("PM2.5", pollutionData.data.iaqi.pm25.v)
+                  : 0,
+              },
+              no2: {
+                v: pollutionData?.data?.iaqi?.no2?.v
+                  ? AQItoConc("NO2", pollutionData.data.iaqi.no2.v)
+                  : 0,
+              },
+            })}
+            customSegmentStops={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+            minValue={0}
+            maxValue={10}
+            segmentColors={[
+              "#99ccff",
+              "#66ccff",
+              "#00ccff",
+              "#99cccc",
+              "#999999",
+              "#999966",
+              "#996600",
+              "#996633",
+              "#993300",
+              "#660000",
+            ]}
+            currentValueText={`AQHI: ${calculateAQHI({
+              o3: {
+                v: pollutionData?.data?.iaqi?.o3?.v
+                  ? AQItoConc("PM10", pollutionData.data.iaqi.o3.v)
+                  : 0,
+              },
+              pm25: {
+                v: pollutionData?.data?.iaqi?.pm25?.v
+                  ? AQItoConc("PM2.5", pollutionData.data.iaqi.pm25.v)
+                  : 0,
+              },
+              no2: {
+                v: pollutionData?.data?.iaqi?.no2?.v
+                  ? AQItoConc("NO2", pollutionData.data.iaqi.no2.v)
+                  : 0,
+              },
+            }).toFixed(2)}`}
+            needleTransitionDuration={3333}
+            needleTransition={Transition.easeElastic}
+            needleColor={"#a7ff83"}
+            textColor={"#d8dee9"}
+          />
+        </div>
+      )}
     </aside>
   ) : (
     <aside className={c.cont}>
@@ -232,6 +296,16 @@ export const PollutionInfo: React.FC = () => {
         <ColorInfo range="201-300" color="#7e0023" title="Дуже нездоровий" />
         <ColorInfo range="300+" color="#660099" title="Небезпечний" />
       </div>
+      <br></br>
+      <br></br>
+      <p className={c.start}>Ризик для здоров'я за рівнем AQHI:</p>
+      <div className={c.infoFlex}>
+        <ColorInfo range="1-3" color="#66ccff" title="Низький" />
+        <ColorInfo range="4-6" color="#999999" title="Середній" />
+        <ColorInfo range="7-10" color="#993300" title="Високий" />
+      </div>
+      <br></br>
+      <br></br>
     </aside>
   );
 };
