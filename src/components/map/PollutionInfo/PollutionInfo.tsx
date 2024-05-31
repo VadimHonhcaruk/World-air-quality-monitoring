@@ -215,23 +215,43 @@ export const PollutionInfo: React.FC = () => {
           <ReactSpeedometer
             width={400}
             needleHeightRatio={0.8}
-            value={calculateAQHI({
-              o3: {
-                v: pollutionData?.data?.iaqi?.o3?.v
-                  ? AQItoConc("PM10", pollutionData.data.iaqi.o3.v)
-                  : 0,
-              },
-              pm25: {
-                v: pollutionData?.data?.iaqi?.pm25?.v
-                  ? AQItoConc("PM2.5", pollutionData.data.iaqi.pm25.v)
-                  : 0,
-              },
-              no2: {
-                v: pollutionData?.data?.iaqi?.no2?.v
-                  ? AQItoConc("NO2", pollutionData.data.iaqi.no2.v)
-                  : 0,
-              },
-            })}
+            value={
+              pollutionData.data.ua
+                ? calculateAQHI({
+                    o3: {
+                      v: pollutionData?.data?.iaqi?.o3?.v
+                        ? pollutionData.data.iaqi.o3.v
+                        : 0,
+                    },
+                    pm25: {
+                      v: pollutionData?.data?.iaqi?.pm25?.v
+                        ? pollutionData.data.iaqi.pm25.v
+                        : 0,
+                    },
+                    no2: {
+                      v: pollutionData?.data?.iaqi?.no2?.v
+                        ? pollutionData.data.iaqi.no2.v
+                        : 0,
+                    },
+                  })
+                : calculateAQHI({
+                    o3: {
+                      v: pollutionData?.data?.iaqi?.o3?.v
+                        ? AQItoConc("PM10", pollutionData.data.iaqi.o3.v)
+                        : 0,
+                    },
+                    pm25: {
+                      v: pollutionData?.data?.iaqi?.pm25?.v
+                        ? AQItoConc("PM2.5", pollutionData.data.iaqi.pm25.v)
+                        : 0,
+                    },
+                    no2: {
+                      v: pollutionData?.data?.iaqi?.no2?.v
+                        ? AQItoConc("NO2", pollutionData.data.iaqi.no2.v)
+                        : 0,
+                    },
+                  })
+            }
             customSegmentStops={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
             minValue={0}
             maxValue={10}
